@@ -4,6 +4,10 @@ from pdf_highlight_extractor.reader import extract_highlights
 import jieba
 import re
 import requests
+from urllib.parse import quote
+import edge_tts
+import asyncio
+from pathlib import Path
 
 def is_chinese(word):
     # Matches Chinese Unicode block U+4E00 to U+9FFF
@@ -19,17 +23,36 @@ def extract_words(args):
         word = word.strip("\n.")
         if len(word) < 10 and is_chinese(word):
             extracted_words.append(h['text'])
-    return extracted_words        
-    
+    return extracted_words
 
-def get_sample_sentences(word):
-    response = requests.get(word)
+async def generate_audio(text, destination_path, rate="-15%"):
+    Path(destination_path).parent.mkdir(parents=True, exist_ok=True)
+    communicate = edge_tts.Communicate(text, "zh-TW-YunJheNeural", rate = rate)
+    await communicate.save(destination_path)
+    
+async def get_sample_sentences(word):
+    url = f"https://api.tatoeba.org/v1/sentences?lang=cmn&q={quote(word)}&sort=relevance&limit=25"
+    response = requests.get(url)
     
     if response.status_code == 200:
-        data = response.json()
-        print(data)
+        res = response.json()
+        
+        try:
+            for i, sentence in enumerate(res["data"]):
+                print(i)
+                text = sentence["text"]
+                if word in text:
+                    sentence_id = res["data"][0]["id"]
+                    destination_path = f"D:/Personal/Mandarin/python_extract/trial_audio/{sentence_id}.mp3"
+                    print(f"Text: {text}")
+                    await generate_audio(text, destination_path)
+                    
+        except Exception as e:
+            print(f"Something went wrong: {e}")
+            
     else:
         print(f"Error: {response.status_code}")
+    
     
 
 def main():
@@ -38,6 +61,10 @@ def main():
     args = parser.parse_args()
     
     extracted_words = extract_words(args)
+    
+    for word in extracted_words:
+        print(word)
+        asyncio.run(get_sample_sentences(word))
         
     print("Number of extracted words: ", len(extracted_words))
     print(extracted_words)
