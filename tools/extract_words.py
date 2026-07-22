@@ -6,11 +6,9 @@ import re
 import requests
 import edge_tts
 from pathlib import Path
+from .misc import is_chinese
 
-def is_chinese(word):
-    # Matches Chinese Unicode block U+4E00 to U+9FFF
-    pattern = re.compile(r'^[\u4e00-\u9fff]+$')
-    return bool(pattern.match(word))
+
 
 def extract_words(args):
     highlights = extract_highlights(args.pdf_path)

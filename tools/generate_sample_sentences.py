@@ -2,7 +2,7 @@ import requests
 from .generate_audio import generate_audio
 from urllib.parse import quote
 
-async def retrieve_sample_sentences(word):
+async def retrieve_sample_sentences_tatoeba(word):
     url = f"https://api.tatoeba.org/v1/sentences?lang=cmn&q={quote(word)}&sort=relevance&limit=25"
     response = requests.get(url)
     
@@ -26,3 +26,7 @@ async def retrieve_sample_sentences(word):
             
     else:
         print(f"Error: {response.status_code}")
+        
+        
+# def retrieve_sample_sentences_from_source(text, word):
+    
