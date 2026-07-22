@@ -7,6 +7,8 @@ from pypdf import PdfReader
 from tools.misc import extract_chinese_text
 import re
 import pymupdf
+import json
+
 
 def main():
     
@@ -15,17 +17,25 @@ def main():
     args = parser.parse_args()
     
     extracted_words = extract_words(args)
+    original_text = extract_chinese_text(args.pdf_path)
+    
+    word_sentence_pair = []
     
     for word in extracted_words:
         print(word)
-        asyncio.run(retrieve_sample_sentences_tatoeba(word))
-        
-    print("Number of extracted words: ", len(extracted_words))
-    print(extracted_words)
+        for index, sentence in enumerate(original_text):
+            if word in sentence:
+                word_sentence_pair.append(
+                    {
+                        'word': word,
+                        'sentence': sentence
+                    }
+                )
     
-    print(extract_chinese_text(args.pdf_path))
+    print(word_sentence_pair)
+    with open("word_sentence_pairs.json", "w", encoding="utf-8") as file:
+        json.dump(word_sentence_pair, file, ensure_ascii=False, indent=2)
     
-
 
 if __name__ == "__main__":
     main()
