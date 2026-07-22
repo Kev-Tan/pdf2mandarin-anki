@@ -13,7 +13,9 @@ import json
 def main():
     
     parser = argparse.ArgumentParser(description="Process arguments")
-    parser.add_argument('--pdf_path', type=str)    
+    parser.add_argument('--pdf_path', type=str)
+    parser.add_argument('--page_start', type=int)
+    parser.add_argument('--page_end', type=int)
     args = parser.parse_args()
     
     extracted_words = extract_words(args)
