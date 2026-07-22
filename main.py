@@ -23,14 +23,14 @@ def main():
     
     for word in extracted_words:
         print(word)
+        sentence_to_be_appended = []
         for index, sentence in enumerate(original_text):
             if word in sentence:
-                word_sentence_pair.append(
-                    {
-                        'word': word,
-                        'sentence': sentence
-                    }
-                )
+                sentence_to_be_appended.append(sentence)
+        word_sentence_pair.append({
+            "word": word,
+            "sentence": sentence_to_be_appended
+        })
     
     print(word_sentence_pair)
     with open("word_sentence_pairs.json", "w", encoding="utf-8") as file:
